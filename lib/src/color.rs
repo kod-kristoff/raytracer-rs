@@ -1,3 +1,5 @@
+use std::ops::{Add, Mul};
+
 pub struct Color {
     e: [f64; 3],
 }
@@ -19,3 +21,26 @@ impl Color {
         self.e[2]
     }
 }
+
+impl Add for Color {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            e: [
+                self.e[0] + rhs.e[0],
+                self.e[1] + rhs.e[1],
+                self.e[2] + rhs.e[2],
+            ]
+        }
+    }
+}
+
+impl Mul<Color> for f64 {
+    type Output = Color;
+
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color { e: [self*rhs.e[0], self*rhs.e[1], self*rhs.e[2]] }
+    }
+}
+

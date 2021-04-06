@@ -35,7 +35,7 @@ fn main() -> io::Result<()> {
             let v = j as f64 / (image_height - 1) as f64;
 
             let ray = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical - origin);
-            let color = ray_color(ray);
+            let color = ray_color(&ray);
             write_color(&mut stdout, color)?;
         }
     }
@@ -43,8 +43,24 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn ray_color(ray: Ray) -> Color {
+fn ray_color(ray: &Ray) -> Color {
+    if hit_sphere(&Point::from_xyz(0., 0., -1.), 0.5, ray) {
+        return Color::from_rgb(1., 0., 0.);
+    }
     let unit_direction = ray.direction().to_unit_vector();
     let t = 0.5*(unit_direction.y() + 1.0);
     (1. - t)*Color::from_rgb(1., 1., 1.) + t*Color::from_rgb(0.5, 0.7, 1.)
+}
+
+fn hit_sphere(
+    center: &Point,
+    radius: f64,
+    ray: &Ray
+) -> bool {
+    let oc = ray.origin() - center;
+    let a = ray.direction().dot(&ray.direction());
+    let b = 2.0 * oc.dot(&ray.direction());
+    let c = oc.dot(&oc) - radius*radius;
+    let discriminant = b*b - 4.*a*c;
+    discriminant > 0.0
 }

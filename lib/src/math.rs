@@ -41,6 +41,10 @@ impl Vec3 {
     pub fn to_unit_vector(&self) -> Self {
         *self / self.length()
     }
+
+    pub fn dot(&self, v: &Self) -> f64 {
+        self.e[0] * v.e[0] + self.e[1] * v.e[1] + self.e[2] * v.e[2]
+    }
 }
 
 impl Add for Vec3 {
@@ -81,6 +85,13 @@ impl Sub for Vec3 {
     }
 }
 
+impl Sub<&Vec3> for Vec3 {
+    type Output = Self;
+
+    fn sub(self, rhs: &Vec3) -> Self::Output {
+        Self { e: [self.e[0] - rhs.e[0], self.e[1] - rhs.e[1], self.e[2] - rhs.e[2]] }
+    }
+}
 
 
 #[cfg(test)]

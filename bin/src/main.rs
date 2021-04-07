@@ -1,17 +1,24 @@
 use raytracer::{
     Color, 
+    HitRecord,
+    Hittable,
     io::write_color,
+    models::{List, Sphere},
     Point,
     Ray,
     Vec3,
 };
 use std::io;
+use std::sync::Arc;
 
 fn main() -> io::Result<()> {
     // Image
     let aspect_ratio: f64 = 16.0 / 9.0;
     let image_width: i32 = 400;
     let image_height: i32 = (image_width as f64 / aspect_ratio) as i32;
+
+    // World
+    let world = create_scene();
 
     // Camera
     let viewport_height = 2.0;
@@ -35,7 +42,7 @@ fn main() -> io::Result<()> {
             let v = j as f64 / (image_height - 1) as f64;
 
             let ray = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical - origin);
-            let color = ray_color(&ray);
+            let color = ray_color(&ray, &world);
             write_color(&mut stdout, color)?;
         }
     }
@@ -43,30 +50,26 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn ray_color(ray: &Ray) -> Color {
-    let t = hit_sphere(&Point::from_xyz(0., 0., -1.), 0.5, ray);
-    if t > 0.0 {
-        let normal = (ray.at(t) - Vec3::from_xyz(0., 0., -1.)).to_unit_vector();
-        return 0.5*Color::from_rgb(normal.x() + 1., normal.y() + 1., normal.z() + 1.);
+fn ray_color(ray: &Ray, world: &Box<dyn Hittable>) -> Color {
+    let mut rec = HitRecord::new();
+    if world.hit(ray, 0., f64::INFINITY, &mut rec) {
+        return 0.5*Color::from_rgb(rec.normal.x() + 1., rec.normal.y() + 1., rec.normal.z() + 1.);
+        
     }
     let unit_direction = ray.direction().to_unit_vector();
     let t = 0.5*(unit_direction.y() + 1.0);
     (1. - t)*Color::from_rgb(1., 1., 1.) + t*Color::from_rgb(0.5, 0.7, 1.)
 }
 
-fn hit_sphere(
-    center: &Point,
-    radius: f64,
-    ray: &Ray
-) -> f64 {
-    let oc = ray.origin() - center;
-    let a = ray.direction().length_squared();
-    let half_b = oc.dot(&ray.direction());
-    let c = oc.length_squared() - radius*radius;
-    let discriminant = half_b*half_b - a*c;
-    if discriminant < 0.0 {
-        -1.0
-    } else {
-        (-half_b - discriminant.sqrt()) / a
-    }
+fn create_scene() -> Box<dyn Hittable> {
+    let mut world = List::new();
+
+    world.add(Arc::new(
+        Sphere::new(Point::from_xyz(0., 0., -1.), 0.5)
+    ));
+    world.add(Arc::new(
+        Sphere::new(Point::from_xyz(0., -100.5, -1.), 100.)
+    ));
+
+    Box::new(world)
 }

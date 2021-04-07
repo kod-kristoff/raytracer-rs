@@ -1,4 +1,5 @@
 use raytracer::{
+    Camera,
     Color, 
     HitRecord,
     Hittable,
@@ -12,23 +13,20 @@ use std::io;
 use std::sync::Arc;
 
 fn main() -> io::Result<()> {
+    use rand::Rng;
+
+    let mut rng = rand::thread_rng();
     // Image
     let aspect_ratio: f64 = 16.0 / 9.0;
     let image_width: i32 = 400;
     let image_height: i32 = (image_width as f64 / aspect_ratio) as i32;
+    let samples_per_pixel = 100;
 
     // World
     let world = create_scene();
 
     // Camera
-    let viewport_height = 2.0;
-    let viewport_width = viewport_height * aspect_ratio;
-    let focal_length = 1.0;
-
-    let origin = Point::from_xyz(0., 0., 0.);
-    let horizontal = Vec3::from_xyz(viewport_width, 0., 0.);
-    let vertical = Vec3::from_xyz(0., viewport_height, 0.);
-    let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::from_xyz(0., 0., focal_length);
+    let camera = Camera::default();
 
     // Render
 
@@ -38,12 +36,15 @@ fn main() -> io::Result<()> {
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {} ", j);
         for i in 0..image_width {
-            let u = i as f64 / (image_width - 1) as f64;
-            let v = j as f64 / (image_height - 1) as f64;
+            let mut color = Color::black();
+            for _ in 0..samples_per_pixel {
+                let u = (i as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
+                let v = (j as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
 
-            let ray = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical - origin);
-            let color = ray_color(&ray, &world);
-            write_color(&mut stdout, color)?;
+                let ray = camera.get_ray(u, v);
+                color += ray_color(&ray, &world);
+            }
+            write_color(&mut stdout, color, samples_per_pixel)?;
         }
     }
     eprintln!("\nDone.");

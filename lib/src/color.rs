@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul};
+use std::ops::{Add, AddAssign, Mul};
 
 pub struct Color {
     e: [f64; 3],
@@ -7,6 +7,10 @@ pub struct Color {
 impl Color {
     pub fn from_rgb(r: f64, g: f64, b: f64) -> Self {
         Self { e: [r, g, b] }
+    }
+
+    pub fn black() -> Self {
+        Self { e: [0., 0., 0.] }
     }
 
     pub fn r(&self) -> f64 {
@@ -31,6 +35,18 @@ impl Add for Color {
                 self.e[0] + rhs.e[0],
                 self.e[1] + rhs.e[1],
                 self.e[2] + rhs.e[2],
+            ]
+        }
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            e: [
+                self.e[0] + other.e[0],
+                self.e[1] + other.e[1],
+                self.e[2] + other.e[2],
             ]
         }
     }

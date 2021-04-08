@@ -6,13 +6,15 @@ pub fn write_color(
     samples_per_pixel: i32,
 ) -> std::io::Result<()> {
     let scale = 1.0/samples_per_pixel as f64;
-    let color = scale*color;
+    let r = (color.r() * scale).sqrt();
+    let g = (color.g() * scale).sqrt();
+    let b = (color.b() * scale).sqrt();
     writeln!(
         writer,
         "{} {} {}",
-        (256. * clamp(color.r(), 0., 0.999)) as i32,
-        (256. * clamp(color.g(), 0., 0.999)) as i32,
-        (256. * clamp(color.b(), 0., 0.999)) as i32
+        (256. * clamp(r, 0., 0.999)) as i32,
+        (256. * clamp(g, 0., 0.999)) as i32,
+        (256. * clamp(b, 0., 0.999)) as i32
     )
 }
 

@@ -1,4 +1,5 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
+use crate::utils;
 
 #[derive(Copy, Clone)]
 pub struct Vec3 {
@@ -16,6 +17,37 @@ impl Default for Vec3 {
 impl Vec3 {
     pub fn from_xyz(x: f64, y: f64, z: f64) -> Self {
         Self { e: [x, y, z] }
+    }
+
+    pub fn random_in_0_1(rng: &mut dyn rand::RngCore) -> Self {
+        Self::from_xyz(
+            utils::random_in_0_1(rng),
+            utils::random_in_0_1(rng),
+            utils::random_in_0_1(rng),
+        )
+    }
+
+    pub fn random_in_interval(
+        rng: &mut dyn rand::RngCore,
+        min: f64,
+        max: f64,
+    ) -> Self {
+        Self::from_xyz(
+            utils::random_in_interval(rng,min,max),
+            utils::random_in_interval(rng,min,max),
+            utils::random_in_interval(rng,min,max),
+        )
+    }
+
+    pub fn random_in_unit_sphere(
+        rng: &mut dyn rand::RngCore
+    ) -> Self {
+        loop {
+            let vec = Self::random_in_interval(rng, -1., 1.);
+            if vec.length_squared() < 1. {
+                return vec;
+            }
+        }
     }
 
     pub fn x(&self) -> f64 {

@@ -5,6 +5,7 @@ mod color;
 mod hittable;
 pub mod models;
 mod ray;
+pub mod utils;
 
 pub use camera::*;
 pub use hittable::*;

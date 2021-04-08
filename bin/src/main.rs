@@ -21,6 +21,7 @@ fn main() -> io::Result<()> {
     let image_width: i32 = 400;
     let image_height: i32 = (image_width as f64 / aspect_ratio) as i32;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
     let world = create_scene();
@@ -42,7 +43,7 @@ fn main() -> io::Result<()> {
                 let v = (j as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
 
                 let ray = camera.get_ray(u, v);
-                color += ray_color(&ray, &world);
+                color += ray_color(&mut rng, &ray, &world, max_depth);
             }
             write_color(&mut stdout, color, samples_per_pixel)?;
         }
@@ -51,10 +52,16 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn ray_color(ray: &Ray, world: &Box<dyn Hittable>) -> Color {
+fn ray_color(rng: &mut dyn rand::RngCore, ray: &Ray, world: &Box<dyn Hittable>, depth: i32) -> Color {
     let mut rec = HitRecord::new();
+
+    if depth <= 0 {
+        return Color::black();
+    }
     if world.hit(ray, 0., f64::INFINITY, &mut rec) {
-        return 0.5*Color::from_rgb(rec.normal.x() + 1., rec.normal.y() + 1., rec.normal.z() + 1.);
+        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere(rng);
+        return 0.5*ray_color(rng, &Ray::new(rec.p, target-rec.p), world, depth-1);
+        // return 0.5*Color::from_rgb(rec.normal.x() + 1., rec.normal.y() + 1., rec.normal.z() + 1.);
         
     }
     let unit_direction = ray.direction().to_unit_vector();

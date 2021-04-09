@@ -74,21 +74,27 @@ fn ray_color(rng: &mut dyn rand::RngCore, ray: &Ray, world: &Box<dyn Hittable>, 
 fn create_scene() -> Box<dyn Hittable> {
     use raytracer::{
         models::{List, Sphere},
-        materials::{Lambertian, Metal},
+        materials::{Lambertian, Metal, Dielectric},
     };
     let mut world = List::new();
 
     let material_ground = Arc::new(
         Lambertian::new(Color::from_rgb(0.8, 0.8, 0.0))
     );
-    let material_center = Arc::new(
-        Lambertian::new(Color::from_rgb(0.7, 0.3, 0.3))
-    );
-    let material_left = Arc::new(
-        Metal::new(Color::from_rgb(0.8, 0.8, 0.8), 0.3)
-    );
+    // let material_center = Arc::new(
+    //     Lambertian::new(Color::from_rgb(0.7, 0.3, 0.3))
+    // );
+    // let material_left = Arc::new(
+    //     Metal::new(Color::from_rgb(0.8, 0.8, 0.8), 0.3)
+    // );
     let material_right = Arc::new(
         Metal::new(Color::from_rgb(0.8, 0.6, 0.2), 1.0)
+    );
+    let material_left = Arc::new(
+        Dielectric::new(Color::from_rgb(0.8, 0.8, 0.8), 1.5)
+    );
+    let material_center = Arc::new(
+        Dielectric::new(Color::from_rgb(0.8, 0.6, 0.2), 1.5)
     );
 
     world.add(Arc::new(

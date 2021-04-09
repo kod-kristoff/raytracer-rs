@@ -14,6 +14,10 @@ impl Color {
         Self { e: [0., 0., 0.] }
     }
 
+    pub fn white() -> Self {
+        Self { e: [1., 1., 1.] }
+    }
+
     pub fn r(&self) -> f64 {
         self.e[0]
     }

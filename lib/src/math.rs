@@ -105,6 +105,20 @@ impl Add for Vec3 {
     }
 }
 
+impl Add<Vec3> for &Vec3 {
+    type Output = Vec3;
+
+    fn add(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            e: [
+                self.e[0] + rhs.e[0],
+                self.e[1] + rhs.e[1],
+                self.e[2] + rhs.e[2],
+            ]
+        }
+    }
+}
+
 impl Div<f64> for Vec3 {
     type Output = Self;
 
@@ -171,6 +185,13 @@ impl Sub<Vec3> for &Vec3 {
 
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
     v - 2.0*v.dot(n)*n
+}
+
+pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+    let cos_theta = (-uv).dot(n).min(1.0);
+    let r_out_perp = etai_over_etat * (uv + cos_theta*n);
+    let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
+    r_out_perp + r_out_parallel
 }
 
 #[cfg(test)]

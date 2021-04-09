@@ -81,9 +81,9 @@ fn create_scene() -> Box<dyn Hittable> {
     let material_ground = Arc::new(
         Lambertian::new(Color::from_rgb(0.8, 0.8, 0.0))
     );
-    // let material_center = Arc::new(
-    //     Lambertian::new(Color::from_rgb(0.7, 0.3, 0.3))
-    // );
+    let material_center = Arc::new(
+        Lambertian::new(Color::from_rgb(0.1, 0.2, 0.5))
+    );
     // let material_left = Arc::new(
     //     Metal::new(Color::from_rgb(0.8, 0.8, 0.8), 0.3)
     // );
@@ -93,9 +93,9 @@ fn create_scene() -> Box<dyn Hittable> {
     let material_left = Arc::new(
         Dielectric::new(Color::from_rgb(0.8, 0.8, 0.8), 1.5)
     );
-    let material_center = Arc::new(
-        Dielectric::new(Color::from_rgb(0.8, 0.6, 0.2), 1.5)
-    );
+    // let material_center = Arc::new(
+    //     Dielectric::new(Color::from_rgb(0.8, 0.6, 0.2), 1.5)
+    // );
 
     world.add(Arc::new(
         Sphere::new(
@@ -116,6 +116,13 @@ fn create_scene() -> Box<dyn Hittable> {
         Sphere::new(
             Point::from_xyz(-1.0, 0.0, -1.0),
             0.5,
+            material_left.clone()
+        )
+    ));
+    world.add(Arc::new(
+        Sphere::new(
+            Point::from_xyz(-1.0, 0.0, -1.0),
+            -0.4,
             material_left
         )
     ));

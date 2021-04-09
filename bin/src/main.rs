@@ -85,10 +85,10 @@ fn create_scene() -> Box<dyn Hittable> {
         Lambertian::new(Color::from_rgb(0.7, 0.3, 0.3))
     );
     let material_left = Arc::new(
-        Metal::new(Color::from_rgb(0.8, 0.8, 0.8))
+        Metal::new(Color::from_rgb(0.8, 0.8, 0.8), 0.3)
     );
     let material_right = Arc::new(
-        Metal::new(Color::from_rgb(0.8, 0.6, 0.2))
+        Metal::new(Color::from_rgb(0.8, 0.6, 0.2), 1.0)
     );
 
     world.add(Arc::new(

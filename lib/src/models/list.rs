@@ -1,4 +1,4 @@
-use crate::{Hittable, HitRecord, Point, Ray, Vec3};
+use crate::{Hittable, HitRecord, Ray};
 use std::sync::Arc;
 
 pub struct List {
@@ -23,21 +23,24 @@ impl Hittable for List {
         ray: &Ray,
         t_min: f64,
         t_max: f64,
-        rec: &mut HitRecord
-    ) -> bool {
-        let mut temp_rec = HitRecord::new();
+    ) -> Option<HitRecord> {
+        let mut rec = HitRecord::new();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
         for object in &self.objects {
-            if object.hit(ray, t_min, closest_so_far, &mut temp_rec) {
+            if let Some(temp_rec) = object.hit(ray, t_min, closest_so_far) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+                rec = temp_rec;
             }
         }
 
-        hit_anything
+        if hit_anything {
+            Some(rec)
+        } else {
+            None
+        }
     }
 }
 

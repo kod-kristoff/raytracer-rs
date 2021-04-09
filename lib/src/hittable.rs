@@ -1,4 +1,5 @@
-use crate::{Point, Ray, Vec3};
+use crate::{Material, Point, Ray, Vec3};
+use std::sync::Arc;
 
 pub trait Hittable {
     fn hit(
@@ -6,16 +7,16 @@ pub trait Hittable {
         ray: &Ray,
         t_min: f64,
         t_max: f64,
-        rec: &mut HitRecord
-    ) -> bool;
+    ) -> Option<HitRecord>;
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point,
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub material: Option<Arc<dyn Material>>,
 }
 
 impl HitRecord {
@@ -25,6 +26,7 @@ impl HitRecord {
             normal: Vec3::default(),
             t: f64::default(),
             front_face: bool::default(),
+            material: None,
         }
     }
 

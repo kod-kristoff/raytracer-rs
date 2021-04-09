@@ -1,4 +1,6 @@
 mod camera;
+mod material;
+pub mod materials;
 mod math;
 pub mod io;
 mod color;
@@ -9,6 +11,7 @@ pub mod utils;
 
 pub use camera::*;
 pub use hittable::*;
+pub use material::*;
 pub use math::*;
 pub use color::*;
 

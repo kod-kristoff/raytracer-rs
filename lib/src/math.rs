@@ -50,6 +50,12 @@ impl Vec3 {
         }
     }
 
+    pub fn random_unit_vector(
+        rng: &mut dyn rand::RngCore
+    ) -> Self {
+        Self::random_in_unit_sphere(rng).to_unit_vector()
+    }
+
     pub fn x(&self) -> f64 {
         self.e[0]
     }
@@ -76,6 +82,12 @@ impl Vec3 {
 
     pub fn dot(&self, v: &Self) -> f64 {
         self.e[0] * v.e[0] + self.e[1] * v.e[1] + self.e[2] * v.e[2]
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+
+        (self.e[0].abs() < s) && (self.e[1].abs() < s) && (self.e[2].abs() < s)
     }
 }
 
@@ -105,6 +117,14 @@ impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3 { e: [self*rhs.e[0], self*rhs.e[1], self*rhs.e[2]] }
+    }
+}
+
+impl Mul<&Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: &Vec3) -> Self::Output {
         Vec3 { e: [self*rhs.e[0], self*rhs.e[1], self*rhs.e[2]] }
     }
 }
@@ -141,6 +161,17 @@ impl Sub<&Vec3> for Vec3 {
     }
 }
 
+impl Sub<Vec3> for &Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: Vec3) -> Self::Output {
+        Vec3 { e: [self.e[0] - rhs.e[0], self.e[1] - rhs.e[1], self.e[2] - rhs.e[2]] }
+    }
+}
+
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    v - 2.0*v.dot(n)*n
+}
 
 #[cfg(test)]
 mod tests {

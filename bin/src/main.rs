@@ -1,10 +1,8 @@
 use raytracer::{
     Camera,
     Color, 
-    HitRecord,
     Hittable,
     io::write_color,
-    models::{List, Sphere},
     Point,
     Ray,
     Vec3,
@@ -53,14 +51,18 @@ fn main() -> io::Result<()> {
 }
 
 fn ray_color(rng: &mut dyn rand::RngCore, ray: &Ray, world: &Box<dyn Hittable>, depth: i32) -> Color {
-    let mut rec = HitRecord::new();
 
     if depth <= 0 {
         return Color::black();
     }
-    if world.hit(ray, 0., f64::INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere(rng);
-        return 0.5*ray_color(rng, &Ray::new(rec.p, target-rec.p), world, depth-1);
+    if let Some(rec) = world.hit(ray, 0.001, f64::INFINITY) {
+        let material = rec.material.clone();
+        if let Some((attenuation, scattered)) = material.and_then(|mat| mat.scatter(rng, ray, &rec)) {
+            return attenuation * ray_color(rng, &scattered, world, depth-1);
+        }
+        return Color::black();
+        // let target = rec.p + rec.normal + Vec3::random_unit_vector(rng);
+        // return 0.5*ray_color(rng, &Ray::new(rec.p, target-rec.p), world, depth-1);
         // return 0.5*Color::from_rgb(rec.normal.x() + 1., rec.normal.y() + 1., rec.normal.z() + 1.);
         
     }
@@ -70,13 +72,53 @@ fn ray_color(rng: &mut dyn rand::RngCore, ray: &Ray, world: &Box<dyn Hittable>, 
 }
 
 fn create_scene() -> Box<dyn Hittable> {
+    use raytracer::{
+        models::{List, Sphere},
+        materials::{Lambertian, Metal},
+    };
     let mut world = List::new();
 
+    let material_ground = Arc::new(
+        Lambertian::new(Color::from_rgb(0.8, 0.8, 0.0))
+    );
+    let material_center = Arc::new(
+        Lambertian::new(Color::from_rgb(0.7, 0.3, 0.3))
+    );
+    let material_left = Arc::new(
+        Metal::new(Color::from_rgb(0.8, 0.8, 0.8))
+    );
+    let material_right = Arc::new(
+        Metal::new(Color::from_rgb(0.8, 0.6, 0.2))
+    );
+
     world.add(Arc::new(
-        Sphere::new(Point::from_xyz(0., 0., -1.), 0.5)
+        Sphere::new(
+            Point::from_xyz(0., -100.5, -1.), 
+            100.0,
+            material_ground
+        )
+    ));
+
+    world.add(Arc::new(
+        Sphere::new(
+            Point::from_xyz(0.0, 0.0, -1.0),
+            0.5,
+            material_center
+        )
     ));
     world.add(Arc::new(
-        Sphere::new(Point::from_xyz(0., -100.5, -1.), 100.)
+        Sphere::new(
+            Point::from_xyz(-1.0, 0.0, -1.0),
+            0.5,
+            material_left
+        )
+    ));
+    world.add(Arc::new(
+        Sphere::new(
+            Point::from_xyz(1.0, 0.0, -1.0),
+            0.5,
+            material_right
+        )
     ));
 
     Box::new(world)

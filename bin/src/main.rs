@@ -22,10 +22,10 @@ fn main() -> io::Result<()> {
     let max_depth = 50;
 
     // World
-    let world = create_scene();
+    let world = camera_scene();
 
     // Camera
-    let camera = Camera::default();
+    let camera = Camera::new(90.0, aspect_ratio);
 
     // Render
 
@@ -69,6 +69,40 @@ fn ray_color(rng: &mut dyn rand::RngCore, ray: &Ray, world: &Box<dyn Hittable>, 
     let unit_direction = ray.direction().to_unit_vector();
     let t = 0.5*(unit_direction.y() + 1.0);
     (1. - t)*Color::from_rgb(1., 1., 1.) + t*Color::from_rgb(0.5, 0.7, 1.)
+}
+
+fn camera_scene() -> Box<dyn Hittable> {
+    use raytracer::{
+        models::{List, Sphere},
+        materials::{Lambertian, Metal, Dielectric},
+    };
+    let mut world = List::new();
+
+    let material_left = Arc::new(
+        Lambertian::new(Color::from_rgb(0., 0., 1.0))
+    );
+    let material_right = Arc::new(
+        Lambertian::new(Color::from_rgb(1.0, 0., 0.))
+    );
+
+    let r = (std::f64::consts::PI / 4.0).cos();
+    world.add(Arc::new(
+        Sphere::new(
+            Point::from_xyz(-r, 0.0, -1.0),
+            r,
+            material_left
+        )
+    ));
+    world.add(Arc::new(
+        Sphere::new(
+            Point::from_xyz(r, 0.0, -1.0),
+            r,
+            material_right
+        )
+    ));
+
+    Box::new(world)
+    
 }
 
 fn create_scene() -> Box<dyn Hittable> {

@@ -22,10 +22,14 @@ fn main() -> io::Result<()> {
     let max_depth = 50;
 
     // World
-    let world = camera_scene();
+    let world = create_scene();
 
     // Camera
-    let camera = Camera::new(90.0, aspect_ratio);
+    let camera = Camera::new(
+        Point::from_xyz(-2., 2., 1.),
+        Point::from_xyz(0., 0., -1.),
+        Vec3::from_xyz(0., 1., 0.),
+        20.0, aspect_ratio);
 
     // Render
 
@@ -156,7 +160,7 @@ fn create_scene() -> Box<dyn Hittable> {
     world.add(Arc::new(
         Sphere::new(
             Point::from_xyz(-1.0, 0.0, -1.0),
-            -0.4,
+            -0.45,
             material_left
         )
     ));

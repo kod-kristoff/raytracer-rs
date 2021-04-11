@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Mul};
+use crate::utils;
 
 #[derive(Clone, Copy)]
 pub struct Color {
@@ -8,6 +9,26 @@ pub struct Color {
 impl Color {
     pub fn from_rgb(r: f64, g: f64, b: f64) -> Self {
         Self { e: [r, g, b] }
+    }
+
+    pub fn random(rng: &mut dyn rand::RngCore) -> Self {
+        Self {
+            e: [
+                utils::random_in_0_1(rng),
+                utils::random_in_0_1(rng),
+                utils::random_in_0_1(rng),
+            ]
+        }
+    }
+
+    pub fn random_in_interval(rng: &mut dyn rand::RngCore, min: f64, max: f64) -> Self {
+        Self {
+            e: [
+                utils::random_in_interval(rng, min, max),
+                utils::random_in_interval(rng, min, max),
+                utils::random_in_interval(rng, min, max),
+            ]
+        }
     }
 
     pub fn black() -> Self {
@@ -74,5 +95,11 @@ impl Mul for Color {
             self.e[1]*rhs.e[1],
             self.e[2]*rhs.e[2],
         ] }
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self { e: [0., 0., 0.] }
     }
 }

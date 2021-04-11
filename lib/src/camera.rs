@@ -10,6 +10,10 @@ pub struct Camera {
     lower_left_corner: Point,
     horizontal: Vec3,
     vertical: Vec3,
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
+    lens_radius: f64,
 }
 
 impl Default for Camera {
@@ -29,6 +33,10 @@ impl Default for Camera {
             lower_left_corner,
             horizontal,
             vertical,
+            u: Vec3::default(),
+            v: Vec3::default(),
+            w: Vec3::default(),
+            lens_radius: 0.0
         }
     }
 }
@@ -39,7 +47,9 @@ impl Camera {
         look_at: Point,
         view_up: Vec3,
         vert_fov: f64,
-        aspect_ratio: f64
+        aspect_ratio: f64,
+        aperture: f64,
+        focus_dist: f64,
     ) -> Self {
         let theta = vert_fov.to_radians();
         let h = (theta/2.0).tan();
@@ -51,25 +61,30 @@ impl Camera {
         let v = cross(&w, &u);
 
         let origin = look_from;
-        let horizontal = viewport_width * u;
-        let vertical = viewport_height * v;
-        let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - w;
+        let horizontal = focus_dist * viewport_width * u;
+        let vertical = focus_dist * viewport_height * v;
+        let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - focus_dist*w;
 
         Self {
             origin,
             lower_left_corner,
             horizontal,
             vertical,
+            u, v, w,
+            lens_radius: aperture/2.0
         }
     }
 
-    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, rng: &mut dyn rand::RngCore, s: f64, t: f64) -> Ray {
+        let rd = self.lens_radius * Vec3::random_in_unit_disk(rng);
+        let offset = rd.x()*self.u + rd.y()*self.v;
         Ray::new(
-            self.origin, 
+            self.origin + offset, 
             self.lower_left_corner 
-                + u*self.horizontal 
-                + v*self.vertical 
+                + s*self.horizontal 
+                + t*self.vertical 
                 - self.origin
+                - offset
         )
 
     }

@@ -50,6 +50,22 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk(
+        rng: &mut dyn rand::RngCore
+        ) -> Self {
+        loop {
+            let vec = Self::from_xyz(
+                utils::random_in_interval(rng, -1., 1.),
+                utils::random_in_interval(rng, -1., 1.),
+                0.0
+            );
+
+            if vec.length_squared() < 1.0 {
+                return vec;
+            }
+        }
+    }
+
     pub fn random_unit_vector(
         rng: &mut dyn rand::RngCore
     ) -> Self {

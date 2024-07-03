@@ -38,7 +38,7 @@ impl Renderer {
                     let ray = camera.get_ray(rng, u, v);
                     color += ray_color(rng, &ray, &world, self.max_depth);
                 }
-                canvas.set(Point2 {x: i, y:j}, color);
+                canvas.set(&Point2 {x: i, y:j}, color);
             }
         }
         

@@ -49,7 +49,7 @@ fn main() -> io::Result<()> {
 
 
     let mut stdout = std::io::stdout();
-    write_ppm(&mut stdout, &canvas, samples_per_pixel)?;
+    write_ppm(&mut stdout, &canvas)?;
     eprintln!("\nDone.");
     Ok(())
 }

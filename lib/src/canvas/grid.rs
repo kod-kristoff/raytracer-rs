@@ -1,13 +1,12 @@
 use crate::{
     Canvas,
-    Color,
     Point2,
 };
 
 pub struct Grid {
     width: usize,
     height: usize,
-    array: Vec<Color>,
+    array: Vec<[u8; 3]>,
 }
 
 impl Grid {
@@ -15,7 +14,7 @@ impl Grid {
         Self { 
             width, 
             height,
-            array: [Color::default()].repeat(width * height),
+            array: [<[u8; 3]>::default()].repeat(width * height),
         }
     }
 }
@@ -29,11 +28,11 @@ impl Canvas for Grid {
         self.height
     }
 
-    fn get(&self, p: Point2) -> &Color {
+    fn get(&self, p: &Point2) -> &[u8; 3] {
         &self.array[p.x + self.width*p.y]
     }
 
-    fn set(&mut self, p: Point2, color: Color) {
+    fn set(&mut self, p: &Point2, color: [u8; 3]) {
         self.array[p.x + self.width*p.y] = color;
     }
 }

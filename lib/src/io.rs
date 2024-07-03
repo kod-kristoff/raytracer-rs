@@ -9,11 +9,13 @@ pub fn write_ppm(
     canvas: & dyn Canvas,
     samples_per_pixel: usize
 ) -> std::io::Result<()> {
-    println!("P3\n{} {}\n255", canvas.width(), canvas.height());
-    for j in (0..canvas.height()).rev() {
-        eprint!("\rScanlines remaining: {} ", j);
-        for i in 0..canvas.width() {
-            write_color(writer, canvas.get(Point2 {x: i, y: j}), samples_per_pixel)?;
+    writeln!(writer, "P3\n{} {}\n255", canvas.width(), canvas.height());
+    for y in (0..canvas.height()).rev() {
+        eprint!("\rScanlines remaining: {} ", y);
+        for x in 0..canvas.width() {
+            let c = canvas.get(Point2 { x, y });
+            writeln!(writer, "{} {} {}", c[0], c[1], c[2])?;
+            // write_color(writer, canvas.get(Point2 {x: i, y: j}), samples_per_pixel)?;
         }
     }
     Ok(()) 
